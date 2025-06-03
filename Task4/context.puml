@@ -1,0 +1,29 @@
+@startuml Открытие депозита - Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title MVP Передача ставок в кол-центр (Context)
+Person(customer, "клиент", "")
+
+Boundary(b, "", ""){
+    System(call_office, "Сall-центр")
+    System_Ext(ext_call_office, "Партнерский call-центр")
+}
+
+System(abc, "АБС", "", "", "delphi")
+
+System(internet_bank, "Интернет банк", "", "", "")
+
+System_Ext(sms_gateway, "Смс шлюз")
+
+Rel(customer, internet_bank, "Просмотр ставок, оформление депозита")
+Rel(abc, sms_gateway, "")
+Rel(sms_gateway, customer, "Уведомление об открытии депозита")
+
+Rel(b, customer, "")
+
+Rel(internet_bank, b, "")
+Rel(b, internet_bank, "Получение информации о текущих ставках")
+
+Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса")
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml Заявка на кредит - Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+AddRelTag("asyncLine", $lineStyle=DashedLine())
+
+title  Онлайн заявка на кредит (Context)
+Person(customer, "клиент", "")
+
+System(internet_bank, "Интернет банк", "", "", "")
+
+System(abc, "АБС", "", "", "")
+System(credit_score, "Кредитный скоринг", "", "", "")
+System(conveer, "Кредитный конвеер", "", "", "")
+System_Ext(buro, "Бюро кредитных историй")
+
+System_Ext(sms_gateway, "Смс шлюз")
+
+Rel(customer, internet_bank, "Просмотр ставок, оформление кредита")
+Rel(abc, sms_gateway, "")
+
+Rel(abc, conveer, "", $tags="asyncLine" )
+Rel(conveer, abc, "обработка заявки сотрудником бэк-офиса", )
+
+Rel(sms_gateway, customer, "Уведомление о изменении статуса заявки", $tags="asyncLine")
+
+Rel_R(internet_bank, abc, "")
+Rel_R(credit_score, internet_bank, "")
+Rel_L(credit_score, buro, "")
+Rel_R(credit_score, abc, "")
+
+@enduml

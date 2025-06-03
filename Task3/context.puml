@@ -1,0 +1,28 @@
+@startuml Открытие депозита - Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title MVP Открытие депозита онлайн (Context)
+Person(customer, "Новый клиент", "")
+
+Boundary(b, "", ""){
+    System(call_office, "Сall-центр")
+    System_Ext(ext_call_office, "Партнерский call-центр")
+}
+
+System(abc, "АБС", "", "", "delphi")
+
+System(internet_bank, "Интернет банк", "", "", "")
+
+System_Ext(sms_gateway, "Смс шлюз")
+
+Rel(customer, internet_bank, "Просмотр ставок, оформление депозита")
+Rel(abc, sms_gateway, "")
+Rel(sms_gateway, customer, "Уведомление об открытии депозита")
+
+Rel(b, customer, "Информирование о подробностях, особые предложения")
+
+Rel(internet_bank, b, "")
+
+Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса")
+
+@enduml

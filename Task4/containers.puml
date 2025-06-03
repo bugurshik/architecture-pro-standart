@@ -1,0 +1,57 @@
+@startuml Открытие депозита - Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title MVP Передача ставок в кол-центр (Context)
+Person(customer, "клиент", "")
+
+
+Boundary(bank, "Система интернет-банка", ""){
+    Container(emploee_site, "Сайт для сотрудников или партнеров")
+    Container(site, "Сайт")
+    Container(gateway, "Gateway")
+    Container(offers_service, "Сервис предложений")
+    Container(offers_service_db, "MS SQL")
+    Container(customer_center, "Центр обработки заявок")
+    Container(customer_center_db, "MS SQL")
+    Container(internet_bank, "Интернет банк", "(текущий монолит)", "")
+    Container(internal_gateway, "Внутренний API Gateway", "", "", "")
+}
+
+Boundary(b, "", ""){
+    System(call_office, "Сall-центр")
+    System_Ext(ext_call_office, "Партнерский call-центр")
+}
+
+System(abc, "АБС", "", "", "delphi")
+System_Ext(sms_gateway, "Смс шлюз")
+
+
+Rel(customer, site, "")
+Rel(abc, sms_gateway, "")
+Rel(call_office, customer, "")
+Rel(sms_gateway, customer, "")
+
+Rel(site, gateway, "")
+
+Rel(offers_service, offers_service_db, "")
+
+Rel(gateway, internet_bank, "")
+Rel(gateway, offers_service, "Получить предложения и ставки")
+Rel(gateway, customer_center, "")
+
+
+Rel(emploee_site, gateway, "")
+Rel(b, emploee_site, "Получить предложения и ставки")
+
+
+Rel(ext_call_office, customer, "")
+Rel(customer_center, b, "")
+Rel(customer_center, customer_center_db, "")
+
+Rel(customer_center, internal_gateway, "")
+Rel(internal_gateway, abc, "")
+
+Lay_D(customer, site)
+Lay_D(customer, abc)
+
+@enduml

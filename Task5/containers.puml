@@ -1,0 +1,64 @@
+@startuml Открытие депозита - Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Онлайн заявка на кредит (Context)
+AddRelTag("asyncLine", $lineStyle=DashedLine())
+
+' Чего только не делал, чтобы клиент "всплыл" вверх - не хочет -___-
+
+Person(customer, "клиент", "")
+
+
+Boundary(credit_b, "Кредитное направление", "Логическая группа"){
+    System(credit_score, "Кредитный скоринг", "", "", "")
+    System(conveer, "Кредитный конвеер", "", "", "")
+    System_Ext(buro, "Бюро кредитных историй")
+}
+
+Boundary(bank, "Система интернет-банка", ""){
+    Container(site, "Сайт")
+    Container(gateway, "Gateway")
+    Container(offers_service, "Сервис предложений")
+    Container(offers_service_db, "MS SQL")
+    Container(customer_center, "Центр обработки заявок")
+    Container(customer_center_db, "MS SQL")
+    Container(internet_bank, "Интернет банк", "(текущий монолит)", "")
+    Container(internal_gateway, "Внутренний API Gateway", "", "", "")
+}
+
+System(abc, "АБС", "", "", "delphi")
+System_Ext(sms_gateway, "Смс шлюз")
+
+Rel(customer, site, "Просмотр ставок, оформление кредита")
+
+Rel(site, gateway, "")
+
+Rel(offers_service, offers_service_db, "")
+
+Rel(gateway, internet_bank, "")
+Rel(gateway, offers_service, "Получить предложения и ставки")
+Rel(gateway, customer_center, "")
+
+Rel(customer_center, customer_center_db, "")
+
+Rel_R(abc, sms_gateway, "")
+
+Rel(abc, conveer, "", $tags="asyncLine" )
+Rel(conveer, abc, "обработка заявки сотрудником бэк-офиса", )
+
+Rel(sms_gateway, customer, "Уведомление о изменении статуса заявки", $tags="asyncLine")
+
+Rel(credit_score, buro, "")
+Rel(credit_score, abc, "")
+
+Rel(internet_bank, internal_gateway, "")
+Rel(offers_service, internal_gateway, "")
+Rel(customer_center, internal_gateway, "")
+Rel(internal_gateway, abc, "Отправка заявки")
+Rel(internal_gateway, credit_score, "")
+
+Lay_U(bank, customer)
+Lay_U(site, customer)
+Lay_U(abc, customer)
+
+@enduml
