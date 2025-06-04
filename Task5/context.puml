@@ -14,7 +14,7 @@ System_Ext(buro, "Бюро кредитных историй")
 
 System_Ext(sms_gateway, "Смс шлюз")
 
-Rel(customer, internet_bank, "Просмотр ставок, оформление кредита")
+Rel(customer, internet_bank, "Просмотр ставок, оформление кредита", "REST")
 Rel(abc, sms_gateway, "")
 
 Rel(abc, conveer, "", $tags="asyncLine" )
@@ -23,8 +23,8 @@ Rel(conveer, abc, "обработка заявки сотрудником бэк
 Rel(sms_gateway, customer, "Уведомление о изменении статуса заявки", $tags="asyncLine")
 
 Rel_R(internet_bank, abc, "")
-Rel_R(credit_score, internet_bank, "")
-Rel_L(credit_score, buro, "")
+Rel_R(credit_score, internet_bank, "", "REST API")
+Rel_L(credit_score, buro, "", "REST API")
 Rel_R(credit_score, abc, "")
 
 @enduml

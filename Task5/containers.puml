@@ -16,14 +16,14 @@ Boundary(credit_b, "Кредитное направление", "Логичес�
 }
 
 Boundary(bank, "Система интернет-банка", ""){
-    Container(site, "Сайт")
-    Container(gateway, "Gateway")
-    Container(offers_service, "Сервис предложений")
-    Container(offers_service_db, "MS SQL")
-    Container(customer_center, "Центр обработки заявок")
-    Container(customer_center_db, "MS SQL")
-    Container(internet_bank, "Интернет банк", "(текущий монолит)", "")
-    Container(internal_gateway, "Внутренний API Gateway", "", "", "")
+    Container(site, "Сайт", "JS/React.js")
+    Container(gateway, "Gateway", "C#/Ocelot")
+    Container(offers_service, "Сервис предложений", "C#/.NET, REST", "Получение информации о продуктах и ставках")
+    Container(offers_service_db, "База данных сервиса предложений", "MS SQL")
+    Container(customer_center, "Центр обработки заявок", "C#/.NET, REST", "Конвеер по обработке продуктовых заявок от пользователей")
+    Container(customer_center_db, "База данных центра обработки заявок ","MS SQL")
+    Container(internet_bank, "Интернет банк", "C#/.NET", "(текущий монолит)")
+    Container(internal_gateway, "Внутренний API Gateway", "C#/Ocelot", "", "")
 }
 
 System(abc, "АБС", "", "", "delphi")
@@ -31,15 +31,14 @@ System_Ext(sms_gateway, "Смс шлюз")
 
 Rel(customer, site, "Просмотр ставок, оформление кредита")
 
-Rel(site, gateway, "")
+Rel(site, gateway, "", "http/https")
 
-Rel(offers_service, offers_service_db, "")
+Rel(offers_service, offers_service_db, "", "read/write")
+Rel(customer_center, customer_center_db, "", "read/write")
 
-Rel(gateway, internet_bank, "")
-Rel(gateway, offers_service, "Получить предложения и ставки")
-Rel(gateway, customer_center, "")
-
-Rel(customer_center, customer_center_db, "")
+Rel(gateway, internet_bank, "", "https")
+Rel(gateway, offers_service, "Получить предложения и ставки", "http/https")
+Rel(gateway, customer_center, "", "http/https")
 
 Rel_R(abc, sms_gateway, "")
 
@@ -51,11 +50,11 @@ Rel(sms_gateway, customer, "Уведомление о изменении ста�
 Rel(credit_score, buro, "")
 Rel(credit_score, abc, "")
 
-Rel(internet_bank, internal_gateway, "")
-Rel(offers_service, internal_gateway, "")
-Rel(customer_center, internal_gateway, "")
-Rel(internal_gateway, abc, "Отправка заявки")
-Rel(internal_gateway, credit_score, "")
+Rel(internet_bank, internal_gateway, "", "REST")
+Rel(offers_service, internal_gateway, "", "REST")
+Rel(customer_center, internal_gateway, "", "REST")
+Rel(abc, customer_center, "Обновление статуса заявки", "REST")
+Rel(internal_gateway, conveer, "Отправление кредитной заявки", "REST")
 
 Lay_U(bank, customer)
 Lay_U(site, customer)
