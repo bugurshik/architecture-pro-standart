@@ -12,17 +12,20 @@ System(credit_score, "Кредитный скоринг", "", "", "")
 System(conveer, "Кредитный конвеер", "", "", "")
 System_Ext(buro, "Бюро кредитных историй")
 
-System_Ext(sms_gateway, "Смс шлюз")
+System(sms_gateway, "Смс шлюз")
+System_Ext(sms_provider, "Телеком провайдер")
+
+Rel(sms_gateway, sms_provider, "Отправка смс", "REST?")
+Rel(sms_provider, customer, "Доставка смс", $tags="asyncLine")
 
 Rel(customer, internet_bank, "Просмотр ставок, оформление кредита", "REST")
-Rel(abc, sms_gateway, "")
+Rel(abc, sms_gateway, "Уведовление о новом статусе заявки")
 
 Rel(abc, conveer, "", $tags="asyncLine" )
 Rel(conveer, abc, "обработка заявки сотрудником бэк-офиса", )
 
-Rel(sms_gateway, customer, "Уведомление о изменении статуса заявки", $tags="asyncLine")
-
-Rel_R(internet_bank, abc, "REST API")
+Rel_R(internet_bank, abc, "", "REST API")
+Rel_R(internet_bank, sms_gateway, "Отправка смс-кода")
 Rel_R(credit_score, internet_bank, "", "REST API")
 Rel_L(credit_score, buro, "", "REST API")
 Rel_R(credit_score, abc, "REST API")
