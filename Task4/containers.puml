@@ -2,51 +2,53 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 title MVP Передача ставок в кол-центр (Context)
+AddRelTag("asyncLine", $lineStyle=DashedLine())
 Person(customer, "клиент", "")
 
 
-Boundary(bank, "Система интернет-банка", ""){
-    Container(emploee_site, "Сайт для сотрудников или партнеров")
-    Container(site, "Сайт")
-    Container(gateway, "Gateway")
-    Container(offers_service, "Сервис предложений")
-    Container(offers_service_db, "MS SQL")
-    Container(customer_center, "Центр обработки заявок")
-    Container(customer_center_db, "MS SQL")
+Boundary(bank, "Интернет банк", ""){
+    Container(site, "Сайт", "JS/React.js")
+    Container(gateway, "Gateway", "C#/Ocelot")
+
+    Container(offers_service, "Сервис предложений", "C#/.Net")
+    Container(offers_service_db, "База данных Сервиса предложений", "MS SQL")
+    Container(offers_service_cache, "Кэш Сервиса предложений", "Redis")
+
+    Container(customer_center, "Центр обработки заявок", "C#/.Net")
+    Container(customer_center_db, "База данных Центра обработки заявок", "MS SQL")
     Container(internet_bank, "Интернет банк", "(текущий монолит)", "")
-    Container(internal_gateway, "Внутренний API Gateway", "", "", "")
+    Container(internal_gateway, "Внутренний API Gateway", "", "C#/Ocelot", "")
 }
 
+Rel(offers_service, b, "Отправка справочной информации", "SMTP",  $tags="asyncLine")
 Boundary(b, "", ""){
     System(call_office, "Сall-центр")
     System_Ext(ext_call_office, "Партнерский call-центр")
 }
 
-System(abc, "АБС", "", "", "delphi")
-System_Ext(sms_gateway, "Смс шлюз")
+System(abc, "АБС", "", "", "")
 
+System(sms_gateway, "СМС-шлюз")
+System_Ext(sms_provider, "Телеком провайдер")
+
+Rel(abc, sms_gateway, "Отправка уведомления", "REST?")
+Rel(sms_gateway, sms_provider, "Отправка смс", "REST?")
+Rel(sms_provider, customer, "Доставка смс")
 
 Rel(customer, site, "")
-Rel(abc, sms_gateway, "")
 Rel(call_office, customer, "")
-Rel(sms_gateway, customer, "")
 
 Rel(site, gateway, "")
 
-Rel(offers_service, offers_service_db, "")
+Rel(offers_service, offers_service_db, "read/write")
+Rel(offers_service, offers_service_cache, "read/write")
 
-Rel(gateway, internet_bank, "")
-Rel(gateway, offers_service, "Получить предложения и ставки")
-Rel(gateway, customer_center, "")
-
-
-Rel(emploee_site, gateway, "")
-Rel(b, emploee_site, "Получить предложения и ставки")
-
+Rel(gateway, internet_bank, "Посмотреть транзакции и уже открытые счета", "REST")
+Rel(gateway, offers_service, "Посмотреть предложения по кредитам/депозитам", "REST")
+Rel(gateway, customer_center, "Отправить заявку на депозит", "REST")
 
 Rel(ext_call_office, customer, "")
-Rel(customer_center, b, "")
-Rel(customer_center, customer_center_db, "")
+Rel(customer_center, customer_center_db, "read/write",)
 
 Rel(customer_center, internal_gateway, "")
 Rel(internal_gateway, abc, "")

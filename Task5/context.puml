@@ -3,7 +3,7 @@
 AddRelTag("asyncLine", $lineStyle=DashedLine())
 
 title  Онлайн заявка на кредит (Context)
-Person(customer, "клиент", "")
+Person(customer, "Клиент", "")
 
 System(internet_bank, "Интернет банк", "", "", "")
 
@@ -22,9 +22,9 @@ Rel(conveer, abc, "обработка заявки сотрудником бэк
 
 Rel(sms_gateway, customer, "Уведомление о изменении статуса заявки", $tags="asyncLine")
 
-Rel_R(internet_bank, abc, "")
+Rel_R(internet_bank, abc, "REST API")
 Rel_R(credit_score, internet_bank, "", "REST API")
 Rel_L(credit_score, buro, "", "REST API")
-Rel_R(credit_score, abc, "")
+Rel_R(credit_score, abc, "REST API")
 
 @enduml

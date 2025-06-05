@@ -2,27 +2,29 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
 title MVP Открытие депозита онлайн (Context)
-Person(customer, "Новый клиент", "")
+
+Person(customer, "Клиент", "")
 
 Boundary(b, "", ""){
     System(call_office, "Сall-центр")
     System_Ext(ext_call_office, "Партнерский call-центр")
 }
 
-System(abc, "АБС", "", "", "delphi")
-
+System(abc, "АБС", "", "", "")
 System(internet_bank, "Интернет банк", "", "", "")
 
-System_Ext(sms_gateway, "Смс шлюз")
+System(sms_gateway, "СМС-шлюз")
+System_Ext(sms_provider, "Телеком провайдер")
 
-Rel(customer, internet_bank, "Просмотр ставок, оформление депозита")
-Rel(abc, sms_gateway, "")
-Rel(sms_gateway, customer, "Уведомление об открытии депозита")
+Rel(customer, internet_bank, "Просмотр ставок, оформление депозита", "REST")
+
+' В задании смс-шлюз и телеком-провайдер уже существуют, но там не указаны технические подробности 
+Rel(abc, sms_gateway, "","REST?")
+Rel(sms_gateway, sms_provider, "Уведомление об открытии депозита", )
+Rel(sms_provider, customer, "Уведомление об открытии депозита")
 
 Rel(b, customer, "Информирование о подробностях, особые предложения")
 
-Rel(internet_bank, b, "")
-
-Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса")
+Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса", "REST")
 
 @enduml

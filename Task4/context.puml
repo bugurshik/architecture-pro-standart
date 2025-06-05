@@ -2,6 +2,8 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
 title MVP Передача ставок в кол-центр (Context)
+AddRelTag("asyncLine", $lineStyle=DashedLine())
+
 Person(customer, "клиент", "")
 
 Boundary(b, "", ""){
@@ -10,20 +12,21 @@ Boundary(b, "", ""){
 }
 
 System(abc, "АБС", "", "", "delphi")
-
 System(internet_bank, "Интернет банк", "", "", "")
 
-System_Ext(sms_gateway, "Смс шлюз")
+System_Ext(sms_provider, "Телеком провайдер")
+System(sms_gateway, "Смс шлюз")
 
-Rel(customer, internet_bank, "Просмотр ставок, оформление депозита")
-Rel(abc, sms_gateway, "")
-Rel(sms_gateway, customer, "Уведомление об открытии депозита")
+Rel(customer, internet_bank, "Просмотр ставок, оформление депозита", "REST")
+' В задании смс-шлюз и телеком-провайдер уже существуют, но там не указаны технические подробности 
+Rel(abc, sms_gateway, "","REST?")
+Rel(sms_gateway, sms_provider, "Уведомление об открытии депозита", )
+Rel(sms_provider, customer, "Уведомление об открытии депозита")
 
 Rel(b, customer, "")
 
-Rel(internet_bank, b, "")
-Rel(b, internet_bank, "Получение информации о текущих ставках")
+Rel(internet_bank, b, "Отправка справочной информации", "SMTP", $tags="asyncLine")
 
-Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса")
+Rel_R(internet_bank, abc, "обработка заявки сотрудником бэк-офиса", "REST")
 
 @enduml

@@ -2,49 +2,60 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 title MVP Открытие депозита онлайн (Context)
-Person(customer, "Новый клиент", "")
+AddRelTag("asyncLine", $lineStyle=DashedLine())
+
+Person(customer, "Клиент", "")
 
 
 Boundary(bank, "Интернет банк", ""){
-    Container(site, "Сайт")
-    Container(gateway, "Gateway")
-    Container(offers_service, "Сервис предложений")
-    Container(offers_service_db, "MS SQL")
-    Container(customer_center, "Центр обработки заявок")
-    Container(customer_center_db, "MS SQL")
+    Container(site, "Сайт", "JS/React.js")
+    Container(gateway, "Gateway", "C#/Ocelot")
+
+    Container(offers_service, "Сервис предложений", "C#/.Net")
+    Container(offers_service_db, "База данных Сервиса предложений", "MS SQL")
+    Container(offers_service_cache, "Кэш Сервиса предложений", "Redis")
+
+    Container(customer_center, "Центр обработки заявок", "C#/.Net")
+    Container(customer_center_db, "База данных Центра обработки заявок", "MS SQL")
     Container(internet_bank, "Интернет банк", "(текущий монолит)", "")
-    Container(internal_gateway, "Внутренний API Gateway", "", "", "")
+    Container(internal_gateway, "Внутренний API Gateway", "", "C#/Ocelot", "")
 }
+
+System(sms_gateway, "СМС-шлюз")
+System_Ext(sms_provider, "Телеком провайдер")
 
 Boundary(b, "", ""){
     System(call_office, "Сall-центр")
     System_Ext(ext_call_office, "Партнерский call-центр")
 }
 
-
-System(abc, "АБС", "", "", "delphi")
-System_Ext(sms_gateway, "Смс шлюз")
-
+System(abc, "АБС", "", "", "")
 
 Rel(customer, site, "")
-Rel(abc, sms_gateway, "")
 Rel(call_office, customer, "")
-Rel(sms_gateway, customer, "")
 
-Rel(site, gateway, "")
+' В задании смс-шлюз и телеком-провайдер уже существуют, но там не указаны технические подробности 
+Rel(abc, sms_gateway, "Отправка уведомления", "REST?")
+Rel(sms_gateway, sms_provider, "", "REST?")
+Rel(sms_provider, customer, "Доставка смс")
 
-Rel(offers_service, offers_service_db, "")
+Rel(site, gateway, "", "https/REST")
 
-Rel(gateway, internet_bank, "Посмотреть транзакции и уже открытые счета")
-Rel(gateway, offers_service, "Посмотреть предложения по кредитам/депозитам")
-Rel(gateway, customer_center, "")
+
+Rel(offers_service, offers_service_db, "", "read/write")
+Rel(offers_service, offers_service_cache, "", "read/write")
+
+Rel(gateway, internet_bank, "Посмотреть транзакции и уже открытые счета", "REST")
+Rel(gateway, offers_service, "Посмотреть предложения по кредитам/депозитам", "REST")
+Rel(gateway, customer_center, "Отправить заявку на депозит", "REST")
 
 Rel(ext_call_office, customer, "")
-Rel(customer_center, b, "")
-Rel(customer_center, customer_center_db, "")
+
+Rel(customer_center, customer_center_db, "", "read/write")
 
 Rel(customer_center, internal_gateway, "обработка заявки сотрудником бэк-офиса")
-Rel(internal_gateway, abc, "")
+Rel(internal_gateway, abc, "", "REST")
+Rel(offers_service, internal_gateway, "Обновление информации о вкладах", "REST")
 
 Lay_D(customer, site)
 Lay_D(customer, abc)
